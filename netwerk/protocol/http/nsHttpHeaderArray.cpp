@@ -385,9 +385,17 @@ nsresult nsHttpHeaderArray::ParseHeaderLine(const nsACString& line,
 
 void nsHttpHeaderArray::Flatten(nsACString& buf, bool pruneProxyHeaders,
                                 bool pruneTransients) {
+                                  int shuffledHeaderIndexes[mHeaders.Length()];
+
+  for (uint32_t i = 0; i < mHeaders.Length(); i++) {
+    shuffledHeaderIndexes[i] = i;
+  }
+
+  std::random_shuffle(shuffledHeaderIndexes, shuffledHeaderIndexes + mHeaders.Length());
+
   uint32_t i, count = mHeaders.Length();
   for (i = 0; i < count; ++i) {
-    const nsEntry& entry = mHeaders[i];
+    const nsEntry& entry = mHeaders[shuffledHeaderIndexes[i]];
     // Skip original header.
     if (entry.variety == eVarietyResponseNetOriginal) {
       continue;
